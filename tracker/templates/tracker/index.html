@@ -1,10 +1,187 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CubeTracker</title>
+
+    <!-- Підключення шрифтів -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;600;800&display=swap"
+          rel="stylesheet">
+
+    <!-- Підключення CSS через статику Django -->
+    <link rel="stylesheet" href="{% static 'tracker/style.css' %}">
 </head>
 <body>
-$END$
+{% csrf_token %}
+<aside class="sidebar">
+    <div class="logo">CubeTracker</div>
+
+    <!-- Панель інформації про сесію -->
+    <div class="session-card">
+        <div class="session-header">
+            <select>
+                <option>Сесія 1</option>
+                <option>Сесія 2</option>
+            </select>
+            <span style="color: var(--text-muted); cursor: pointer;">⚙️</span>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <span>Best</span>
+                <strong>12.45</strong>
+            </div>
+            <div class="stat-item">
+                <span>Mean</span>
+                <strong>15.30</strong>
+            </div>
+            <div class="stat-item">
+                <span>Count</span>
+                <strong>42</strong>
+            </div>
+            <div class="stat-item">
+                <span>Session</span>
+                <strong>14.90</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- Таблиця збірок -->
+    <div class="solves-container">
+        <div class="solves-header">
+            <div>#</div>
+            <div>Time</div>
+            <div>ao5</div>
+            <div>ao12</div>
+        </div>
+        <div class="solves-list">
+            {% for solve in solves %}
+                <div class="solve-row">
+                    <!-- forloop.revcounter покаже порядковий номер (3, 2, 1...) -->
+                    <div style="color: var(--text-muted);">{{ forloop.revcounter }}</div>
+
+                    <!-- Виводимо час збірки з бази -->
+                    <div class="time">{{ solve.time }}</div>
+
+                    <!-- Заглушки для ao5 та ao12 -->
+                    <div>-</div>
+                    <div>-</div>
+                </div>
+            {% empty %}
+                <div style="text-align: center; padding: 20px; color: var(--text-muted);">
+                    Ще немає збірок у цій сесії
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</aside>
+
+<main class="main-area">
+    <!-- Блок скрамблу -->
+    <div class="scramble-section">
+        <div class="scramble-controls">
+            <button>3x3x3 WCA</button>
+            <button>Наступний скрамбл ➔</button>
+        </div>
+        <div class="scramble-text">
+            {{ current_scramble }}
+        </div>
+    </div>
+
+    <!-- Блок таймера -->
+    <div class="timer-section">
+        <div class="timer-display">0.00</div>
+        <div class="timer-averages">
+            <span>ao5: <strong>-</strong></span>
+            <span>ao12: <strong>-</strong></span>
+        </div>
+    </div>
+</main>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const timerDisplay = document.querySelector('.timer-display');
+        const scrambleDisplay = document.querySelector('.scramble-text');
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        let startTime;
+        let timerInterval;
+        let isRunning = false;
+        let isHolding = false;
+        let finalTime = 0;
+
+        function formatTime(ms) {
+            return (ms / 1000).toFixed(2);
+        }
+
+        function updateTimer() {
+            const elapsedTime = Date.now() - startTime;
+            timerDisplay.textContent = formatTime(elapsedTime);
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (isRunning) {
+                e.preventDefault();
+
+                clearInterval(timerInterval);
+                isRunning = false;
+                isHolding = false;
+
+                finalTime = formatTime(Date.now() - startTime);
+                timerDisplay.textContent = finalTime;
+
+
+                saveTime(finalTime, scrambleDisplay.textContent.trim());
+
+                return;
+            }
+
+            if (e.code === 'Space') {
+                e.preventDefault(); //
+
+                if (!isHolding) {
+                    isHolding = true;
+                    timerDisplay.style.color = 'var(--timer-color)';
+                }
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (e.code === 'Space' && !isRunning) {
+                isHolding = false;
+                isRunning = true;
+                startTime = Date.now();
+                timerDisplay.style.color = 'var(--text-main)';
+                timerInterval = setInterval(updateTimer, 10);
+            }
+        });
+
+        function saveTime(timeValue, scrambleText) {
+            fetch('/save/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({
+                    time: timeValue,
+                    scramble: scrambleText
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        console.log('Збережено успішно!', data);
+                        window.location.reload();
+                    } else {
+                        alert('Помилка збереження: ' + data.message);
+                    }
+                })
+                .catch(error => console.error('Помилка fetch:', error));
+        }
+    });
+</script>
+</body>
+</html>
 </body>
 </html>

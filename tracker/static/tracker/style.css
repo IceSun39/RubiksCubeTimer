@@ -1,0 +1,225 @@
+:root {
+    --bg-main: #1e1e2e;
+    --bg-panel: #181825;
+    --bg-card: #313244;
+    --text-main: #cdd6f4;
+    --text-muted: #a6adc8;
+    --accent: #89b4fa;
+    --timer-color: #a6e3a1;
+    --border-radius: 12px;
+    --border-color: #45475a;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* ================= ЛІВА ПАНЕЛЬ ================= */
+.sidebar {
+    background-color: var(--bg-panel);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    gap: 20px;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--accent);
+    text-align: center;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* Панель сесії */
+.session-card {
+    background-color: var(--bg-card);
+    padding: 15px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.session-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.session-header select {
+    background: var(--bg-main);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    padding: 5px 10px;
+    border-radius: 6px;
+    outline: none;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    font-size: 0.85rem;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-main);
+    padding: 8px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.stat-item span {
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+.stat-item strong {
+    font-size: 1.1rem;
+    color: var(--accent);
+}
+
+/* Список збірок */
+.solves-container {
+    flex-grow: 1;
+    background-color: var(--bg-card);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.solves-header {
+    display: grid;
+    grid-template-columns: 40px 1fr 1fr 1fr;
+    padding: 10px;
+    background-color: var(--bg-main);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.solves-list {
+    overflow-y: auto;
+    flex-grow: 1;
+    padding: 5px;
+}
+
+.solve-row {
+    display: grid;
+    grid-template-columns: 40px 1fr 1fr 1fr;
+    padding: 8px 10px;
+    text-align: center;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.9rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: background 0.2s;
+    border-radius: 6px;
+}
+
+.solve-row:hover {
+    background-color: var(--bg-main);
+    cursor: pointer;
+}
+
+.solve-row .time {
+    font-weight: bold;
+    color: var(--text-main);
+}
+
+/* ================= ГОЛОВНА ПАНЕЛЬ ================= */
+.main-area {
+    display: flex;
+    flex-direction: column;
+    padding: 30px;
+    position: relative;
+}
+
+/* Скрамбл */
+.scramble-section {
+    background-color: var(--bg-panel);
+    padding: 20px 30px;
+    border-radius: var(--border-radius);
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-color);
+}
+
+.scramble-controls {
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.scramble-controls button {
+    background-color: var(--bg-card);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.scramble-controls button:hover {
+    background-color: var(--accent);
+    color: var(--bg-main);
+    border-color: var(--accent);
+}
+
+.scramble-text {
+    font-family: 'Fira Code', monospace;
+    font-size: 1.8rem;
+    line-height: 1.4;
+    color: var(--text-main);
+    letter-spacing: 2px;
+}
+
+/* Таймер */
+.timer-section {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.timer-display {
+    font-family: 'Fira Code', monospace;
+    font-size: 14rem;
+    font-weight: 600;
+    color: var(--timer-color);
+    line-height: 1;
+    margin-bottom: 30px;
+    text-shadow: 0 0 20px rgba(166, 227, 161, 0.2);
+}
+
+.timer-averages {
+    display: flex;
+    gap: 40px;
+    font-size: 2rem;
+    color: var(--text-muted);
+    font-family: 'Inter', sans-serif;
+}
+
+.timer-averages span strong {
+    color: var(--accent);
+}
