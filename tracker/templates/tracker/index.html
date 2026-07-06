@@ -107,8 +107,10 @@
         let startTime;
         let timerInterval;
         let isRunning = false;
+
         let isHolding = false;
-        let finalTime = 0;
+        let isReady = false;
+        let holdTimeout;
 
         function formatTime(ms) {
             return (ms / 1000).toFixed(2);
@@ -122,37 +124,45 @@
         window.addEventListener('keydown', (e) => {
             if (isRunning) {
                 e.preventDefault();
-
                 clearInterval(timerInterval);
                 isRunning = false;
-                isHolding = false;
 
-                finalTime = formatTime(Date.now() - startTime);
+                let finalTime = formatTime(Date.now() - startTime);
                 timerDisplay.textContent = finalTime;
 
-
                 saveTime(finalTime, scrambleDisplay.textContent.trim());
-
                 return;
             }
 
-            if (e.code === 'Space') {
-                e.preventDefault(); //
+            if (e.code === 'Space' && !isHolding) {
+                e.preventDefault();
+                isHolding = true;
+                isReady = false;
 
-                if (!isHolding) {
-                    isHolding = true;
+                timerDisplay.style.color = '#f38ba8';
+
+                holdTimeout = setTimeout(() => {
+                    isReady = true;
                     timerDisplay.style.color = 'var(--timer-color)';
-                }
+                }, 1000);
             }
         });
 
         window.addEventListener('keyup', (e) => {
-            if (e.code === 'Space' && !isRunning) {
+            if (e.code === 'Space' && isHolding) {
+                e.preventDefault();
                 isHolding = false;
-                isRunning = true;
-                startTime = Date.now();
-                timerDisplay.style.color = 'var(--text-main)';
-                timerInterval = setInterval(updateTimer, 10);
+                clearTimeout(holdTimeout);
+
+                if (isReady) {
+                    isRunning = true;
+                    isReady = false;
+                    startTime = Date.now();
+                    timerDisplay.style.color = 'var(--text-main)';
+                    timerInterval = setInterval(updateTimer, 10);
+                } else {
+                    timerDisplay.style.color = 'var(--text-main)';
+                }
             }
         });
 
@@ -168,20 +178,15 @@
                     scramble: scrambleText
                 })
             })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        console.log('Збережено успішно!', data);
-                        window.location.reload();
-                    } else {
-                        alert('Помилка збереження: ' + data.message);
-                    }
-                })
-                .catch(error => console.error('Помилка fetch:', error));
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    console.log('Час успішно збережено в БД!', data);
+                }
+            })
+            .catch(error => console.error('Помилка fetch:', error));
         }
     });
 </script>
-</body>
-</html>
 </body>
 </html>

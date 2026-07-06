@@ -54,3 +54,6 @@ def save_solve(request):
 
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+def get_scramble(request):
+    return scrambler333.get_WCA_scramble()
